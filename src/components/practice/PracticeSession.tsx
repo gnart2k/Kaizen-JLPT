@@ -9,6 +9,9 @@ import { practiceQuestions } from '@/lib/data';
 import { getExplanation } from '@/app/actions';
 import { Skeleton } from '../ui/skeleton';
 import { CheckCircle, XCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { cn } from '@/lib/utils';
 
 export function PracticeSession() {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -25,19 +28,24 @@ export function PracticeSession() {
         const isCorrect = selectedAnswer === question.correctAnswer;
         setFeedback(isCorrect ? 'correct' : 'incorrect');
 
-        if (!isCorrect) {
-            setIsLoading(true);
-            setAiExplanation(null);
-            const result = await getExplanation({ query: `In the sentence "${question.question}", why is the answer "${selectedAnswer}" incorrect and "${question.correctAnswer}" correct?` });
-            if (result.success) {
-                setAiExplanation(result.explanation);
-            } else {
-                setAiExplanation(result.error || 'Failed to load explanation.');
-            }
-            setIsLoading(false);
+        setIsLoading(true);
+        setAiExplanation(null);
+
+        let query = '';
+        if (isCorrect) {
+            query = question.explanation || `The answer for "${question.question}" is "${question.correctAnswer}". Explain why this is correct.`
         } else {
-             setAiExplanation(question.explanation || 'Great job!');
+            query = `In the sentence "${question.question}", why is the answer "${selectedAnswer}" incorrect and "${question.correctAnswer}" correct?`;
         }
+        
+        const result = await getExplanation({ query });
+        
+        if (result.success) {
+            setAiExplanation(result.explanation);
+        } else {
+            setAiExplanation(result.error || 'Failed to load explanation.');
+        }
+        setIsLoading(false);
     };
     
     const handleNext = () => {
@@ -61,20 +69,26 @@ export function PracticeSession() {
 
             <div className="mt-6">
                 {!feedback ? (
-                     <Button onClick={handleSubmit} disabled={!selectedAnswer} className="rounded-lg">Check Answer</Button>
+                     <Button onClick={handleSubmit} disabled={!selectedAnswer || isLoading} className="rounded-lg">
+                        {isLoading ? 'Getting Feedback...' : 'Check Answer'}
+                     </Button>
                 ) : (
                     <Button onClick={handleNext} className="rounded-lg">Next Question</Button>
                 )}
             </div>
 
-            {feedback && (
-                <Card className={`mt-6 rounded-2xl border-2 ${feedback === 'correct' ? 'border-success' : 'border-destructive'}`}>
+            {(feedback || isLoading) && (
+                <Card className={`mt-6 rounded-2xl ${!feedback ? 'border-dashed' : (feedback === 'correct' ? 'border-success border-2' : 'border-destructive border-2')}`}>
                     <CardHeader>
-                        <CardTitle className={`flex items-center gap-2 ${feedback === 'correct' ? 'text-success' : 'text-destructive'}`}>
-                            {feedback === 'correct' ? <CheckCircle /> : <XCircle />}
-                            {feedback === 'correct' ? 'Correct!' : 'Incorrect'}
-                        </CardTitle>
-                        {feedback === 'incorrect' && <CardDescription>Correct answer: {question.correctAnswer}</CardDescription>}
+                        {feedback && (
+                            <>
+                                <CardTitle className={`flex items-center gap-2 ${feedback === 'correct' ? 'text-success' : 'text-destructive'}`}>
+                                    {feedback === 'correct' ? <CheckCircle /> : <XCircle />}
+                                    {feedback === 'correct' ? 'Correct!' : 'Incorrect'}
+                                </CardTitle>
+                                {feedback === 'incorrect' && <CardDescription>Correct answer: {question.correctAnswer}</CardDescription>}
+                            </>
+                        )}
                     </CardHeader>
                     <CardContent>
                         {isLoading && (
@@ -84,7 +98,9 @@ export function PracticeSession() {
                             </div>
                         )}
                         {aiExplanation && !isLoading && (
-                            <p className="text-sm text-muted-foreground leading-relaxed">{aiExplanation}</p>
+                             <div className={cn('prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed')}>
+                                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{aiExplanation}</ReactMarkdown>
+                            </div>
                         )}
                     </CardContent>
                 </Card>

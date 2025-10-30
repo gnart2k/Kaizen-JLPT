@@ -18,7 +18,7 @@ const ExplanationInputSchema = z.object({
 export type ExplanationInput = z.infer<typeof ExplanationInputSchema>;
 
 const ExplanationOutputSchema = z.object({
-  explanation: z.string().describe('The AI-generated explanation.'),
+  explanation: z.string().describe('The AI-generated explanation in Markdown format.'),
 });
 export type ExplanationOutput = z.infer<typeof ExplanationOutputSchema>;
 
@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
 
 {{{query}}}
 
-Focus on meaning, usage context, and common examples.`,
+Focus on meaning, usage context, and common examples. Format your response using Markdown for clear presentation (e.g., headings, bold, italics, lists).`,
 });
 
 const explanationFlow = ai.defineFlow(

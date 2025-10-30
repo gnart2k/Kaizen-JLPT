@@ -5,6 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { getExplanation } from '@/app/actions';
 import type { LibraryItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { cn } from '@/lib/utils';
 
 interface ExplanationDialogProps {
     item: LibraryItem;
@@ -53,9 +56,9 @@ export function ExplanationDialog({ item, open, onOpenChange }: ExplanationDialo
                     )}
                     {error && <p className="text-sm text-destructive">{error}</p>}
                     {!isLoading && explanation && (
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                            {explanation}
-                        </p>
+                        <div className={cn('prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed')}>
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{explanation}</ReactMarkdown>
+                        </div>
                     )}
                 </div>
             </DialogContent>
