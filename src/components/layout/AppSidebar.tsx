@@ -33,7 +33,7 @@ export function AppSidebar() {
             <Button variant="ghost" size="icon" className="shrink-0 rounded-lg">
                 <Compass className="h-6 w-6 text-primary" />
             </Button>
-            <h1 className="text-xl font-semibold font-headline">Nihongo Compass</h1>
+            <h1 className="text-xl font-semibold font-headline">Kaizen JLPT</h1>
             <div className="ml-auto hidden lg:block">
                 <SidebarTrigger />
             </div>

@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Nihongo Compass',
+  title: 'Kaizen JLPT',
   description: 'Your guide to mastering Japanese for the JLPT.',
 };
 
