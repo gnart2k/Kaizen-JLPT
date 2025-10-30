@@ -5,22 +5,26 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { practiceQuestions } from '@/lib/data';
 import { getExplanation } from '@/app/actions';
 import { Skeleton } from '../ui/skeleton';
 import { CheckCircle, XCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { cn } from '@/lib/utils';
+import type { PracticeQuestion } from '@/lib/types';
 
-export function PracticeSession() {
+interface PracticeSessionProps {
+    questions: PracticeQuestion[];
+}
+
+export function PracticeSession({ questions }: PracticeSessionProps) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
     const [aiExplanation, setAiExplanation] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const question = practiceQuestions[currentQuestionIndex];
+    const question = questions[currentQuestionIndex];
 
     const handleSubmit = async () => {
         if (!selectedAnswer) return;
@@ -52,7 +56,7 @@ export function PracticeSession() {
         setSelectedAnswer(null);
         setFeedback(null);
         setAiExplanation(null);
-        setCurrentQuestionIndex((prev) => (prev + 1) % practiceQuestions.length);
+        setCurrentQuestionIndex((prev) => (prev + 1) % questions.length);
     }
     
     return (
