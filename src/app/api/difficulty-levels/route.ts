@@ -1,0 +1,13 @@
+import { db } from '@/lib/db';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    const difficultyLevels = await db.query.difficultyLevels.findMany();
+    console.log(difficultyLevels)
+    return NextResponse.json(difficultyLevels);
+  } catch (error) {
+    console.error('GET difficulty levels error:', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}

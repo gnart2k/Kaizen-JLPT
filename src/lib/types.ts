@@ -33,3 +33,12 @@ export type PracticeQuestion = {
     correctAnswer: string;
     explanation?: string;
 };
+
+export type DifficultyLevel = {
+  id: string;
+  language: string;
+  levelName: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+};

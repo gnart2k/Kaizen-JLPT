@@ -28,7 +28,7 @@ export function ExplanationDialog({ item, open, onOpenChange }: ExplanationDialo
             const fetchExplanation = async () => {
                 const result = await getExplanation({ query: item.item });
                 if (result.success) {
-                    setExplanation(result.explanation);
+                    setExplanation(result.explanation || '');
                 } else {
                     setError(result.error || 'An unknown error occurred.');
                 }

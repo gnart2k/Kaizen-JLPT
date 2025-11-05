@@ -45,7 +45,7 @@ export function PracticeSession({ questions }: PracticeSessionProps) {
         const result = await getExplanation({ query });
         
         if (result.success) {
-            setAiExplanation(result.explanation);
+            setAiExplanation(result.explanation || null);
         } else {
             setAiExplanation(result.error || 'Failed to load explanation.');
         }
