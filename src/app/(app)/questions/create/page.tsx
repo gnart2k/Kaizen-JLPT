@@ -36,7 +36,7 @@ export default function CreateQuestionPage() {
     resolver: zodResolver(formSchema),
   });
 
-  const { levels, isLoading, error } = useDifficultyLevels();
+  const { levels, isLoading, error } = useDifficultyLevels("ja");
 
   useEffect(() => {
     form.reset({
@@ -46,7 +46,7 @@ export default function CreateQuestionPage() {
         { answerText: '', isCorrect: true },
         { answerText: '', isCorrect: false },
       ],
-      language: 'jp',
+      language: 'ja',
       difficultyLevelId: '',
       category: '',
     });
@@ -186,27 +186,7 @@ export default function CreateQuestionPage() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="language"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Language</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a language" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="ja">Japanese</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
 
         <FormField
           control={form.control}
