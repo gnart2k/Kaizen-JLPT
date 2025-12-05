@@ -30,3 +30,14 @@ This document outlines the conventions and commands for automated agents operati
 ### Error Handling
 *   Use standard TypeScript/JavaScript `try...catch` blocks for runtime errors.
 *   Ensure all asynchronous operations are properly handled.
+
+## 3. Feature Development Workflow
+
+Before starting a new feature, agents must define a plan and document it in the `@plans/` directory. The plan file must be prefixed with a sequential number (e.g., `0004_new_feature_name.md`).
+
+The plan document must include:
+*   **Plan Name:** A concise title for the feature.
+*   **Files to be Created:** List of new files and their purpose.
+*   **File Location:** The absolute or relative path where each new file will be located.
+*   **Description:** A detailed explanation of the feature and its motivation.
+*   **File Structure:** A high-level outline or pseudo-code for the structure of the main files.

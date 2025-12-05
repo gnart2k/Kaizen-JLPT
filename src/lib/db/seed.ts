@@ -12,19 +12,21 @@ const seedData: NewDifficultyLevel[] = [
   { language: 'ja', levelName: 'N2', description: 'Upper intermediate level Japanese (JLPT N2).' },
   { language: 'ja', levelName: 'N1', description: 'Advanced level Japanese (JLPT N1).' },
 
-  // Korean (Generic Levels)
-  { language: 'ko', levelName: 'Level 1', description: 'Beginner level Korean.' },
-  { language: 'ko', levelName: 'Level 2', description: 'Lower intermediate level Korean.' },
-  { language: 'ko', levelName: 'Level 3', description: 'Intermediate level Korean.' },
-  { language: 'ko', levelName: 'Level 4', description: 'Upper intermediate level Korean.' },
-  { language: 'ko', levelName: 'Level 5', description: 'Advanced level Korean.' },
+  // Korean (TOPIK)
+  { language: 'ko', levelName: 'TOPIK 1', description: 'Beginner level Korean (TOPIK 1).' },
+  { language: 'ko', levelName: 'TOPIK 2', description: 'Lower intermediate level Korean (TOPIK 2).' },
+  { language: 'ko', levelName: 'TOPIK 3', description: 'Intermediate level Korean (TOPIK 3).' },
+  { language: 'ko', levelName: 'TOPIK 4', description: 'Upper intermediate level Korean (TOPIK 4).' },
+  { language: 'ko', levelName: 'TOPIK 5', description: 'Advanced level Korean (TOPIK 5).' },
+  { language: 'ko', levelName: 'TOPIK 6', description: 'Highest level Korean (TOPIK 6).' },
 
-  // Chinese (Generic Levels)
-  { language: 'zh', levelName: 'Level 1', description: 'Beginner level Chinese.' },
-  { language: 'zh', levelName: 'Level 2', description: 'Lower intermediate level Chinese.' },
-  { language: 'zh', levelName: 'Level 3', description: 'Intermediate level Chinese.' },
-  { language: 'zh', levelName: 'Level 4', description: 'Upper intermediate level Chinese.' },
-  { language: 'zh', levelName: 'Level 5', description: 'Advanced level Chinese.' },
+  // Chinese (HSK)
+  { language: 'zh', levelName: 'HSK 1', description: 'Beginner level Chinese (HSK 1).' },
+  { language: 'zh', levelName: 'HSK 2', description: 'Lower intermediate level Chinese (HSK 2).' },
+  { language: 'zh', levelName: 'HSK 3', description: 'Intermediate level Chinese (HSK 3).' },
+  { language: 'zh', levelName: 'HSK 4', description: 'Upper intermediate level Chinese (HSK 4).' },
+  { language: 'zh', levelName: 'HSK 5', description: 'Advanced level Chinese (HSK 5).' },
+  { language: 'zh', levelName: 'HSK 6', description: 'Highest level Chinese (HSK 6).' },
 
   // English (CEFR)
   { language: 'en', levelName: 'A1', description: 'CEFR A1 (Beginner) level English.' },
@@ -45,7 +47,7 @@ async function seedDifficultyLevels() {
       })
       .returning({ id: difficultyLevels.id });
 
-    console.log(\`Successfully seeded \${result.length} new difficulty levels.\`);
+    console.log(`Successfully seeded ${result.length} new difficulty levels.`);
   } catch (error) {
     console.error('Error seeding difficulty levels:', error);
     process.exit(1);

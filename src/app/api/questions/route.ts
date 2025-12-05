@@ -27,11 +27,16 @@ export async function POST(req: Request) {
 
     // Assuming the client sends the data in the new structured format
     const validatedData = questionSchema.parse(body);
-    const { answers: answerData, ...questionData } = validatedData;
+    const { answers: answerData, explanation, ...restQuestionData } = validatedData;
+
+    const questionDataForDb = {
+      ...restQuestionData,
+      explanation: explanation || '', // Ensure explanation is a string for Drizzle schema
+    };
 
     const newQuestion = await db.transaction(async (tx) => {
       // 1. Insert into questions table
-      const [question] = await tx.insert(questions).values(questionData).returning({ id: questions.id });
+      const [question] = await tx.insert(questions).values(questionDataForDb).returning({ id: questions.id });
 
       if (!question) {
         throw new Error('Failed to create question');
@@ -47,7 +52,7 @@ export async function POST(req: Request) {
       const newAnswers = await tx.insert(answers).values(answersToInsert).returning();
 
       return {
-        ...questionData,
+        ...questionDataForDb,
         id: question.id,
         answers: newAnswers,
       };
