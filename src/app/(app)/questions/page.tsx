@@ -76,9 +76,14 @@ export default function QuestionsPage() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Questions</h1>
-        <Button asChild>
-          <Link href="/questions/create">Create Question</Link>
-        </Button>
+        <div className="flex space-x-2">
+          <Button asChild variant="outline">
+            <Link href="/questions/bulk-upload">Bulk Upload</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/questions/create">Create Question</Link>
+          </Button>
+        </div>
       </div>
       <Table>
         <TableHeader>
