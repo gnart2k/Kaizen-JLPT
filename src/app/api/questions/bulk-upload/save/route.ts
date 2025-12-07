@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { answers, questions } from '@/lib/db/schema';
 import { NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import z from 'zod';
 import { questionSchema } from '@/validation-schema/question-schema';
 
@@ -30,20 +30,20 @@ export async function POST(request: Request) {
       const answerInserts: (typeof answers.$inferInsert)[] = [];
 
       for (const q of validatedQuestions) {
-        const questionId = uuidv4();
+        const questionId = randomUUID();
 
         questionInserts.push({
           id: questionId,
           question: q.question,
           explanation: q.explanation,
-          language: q.language,
+          languageId: q.languageId,
           difficultyLevelId: q.difficultyLevelId,
-          category: q.category,
+          categoryId: q.categoryId,
         } as typeof questions.$inferInsert);
 
         for (const a of q.answers) {
           answerInserts.push({
-            id: uuidv4(),
+            id: randomUUID(),
             questionId: questionId,
             answerText: a.answerText,
             isCorrect: a.isCorrect,

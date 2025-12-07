@@ -47,9 +47,9 @@ export default function QuestionsPage() {
             {questions.map((question) => (
               <TableRow key={question.id}>
                 <TableCell>{question.question}</TableCell>
-                <TableCell>{question.language}</TableCell>
-                <TableCell>{question.difficulty}</TableCell>
-                <TableCell>{question.category}</TableCell>
+                <TableCell>{question.language?.name || 'Unknown'}</TableCell>
+                <TableCell>{question.difficultyLevel?.levelName || 'Not set'}</TableCell>
+                <TableCell>{question.category?.name || 'Not set'}</TableCell>
                 <TableCell className="space-x-2">
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/questions/${question.id}/edit`}>Edit</Link>

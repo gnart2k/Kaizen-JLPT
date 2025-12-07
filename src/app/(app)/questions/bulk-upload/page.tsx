@@ -195,7 +195,7 @@ export default function BulkUploadPage() {
                         <TableCell>{index + 1}</TableCell>
                         <TableCell className="max-w-xs truncate">{q.question}</TableCell>
                         <TableCell>{q.difficultyLevelId || 'N/A'}</TableCell>
-                        <TableCell>{q.category || 'N/A'}</TableCell>
+                        <TableCell>{q.categoryId || 'N/A'}</TableCell>
                         <TableCell>
                           <ul className="list-disc pl-4">
                             {q.answers.map((a, aIndex) => (

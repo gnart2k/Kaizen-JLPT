@@ -7,7 +7,7 @@ type UseDifficultyLevelsResult = {
   error: Error | null;
 };
 
-export const useDifficultyLevels = (language?: string): UseDifficultyLevelsResult => {
+export const useDifficultyLevels = (): UseDifficultyLevelsResult => {
   const [levels, setLevels] = useState<DifficultyLevel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -15,10 +15,7 @@ export const useDifficultyLevels = (language?: string): UseDifficultyLevelsResul
   useEffect(() => {
     const fetchLevels = async () => {
       try {
-        const url = language
-          ? `/api/difficulty-levels?language=${language}`
-          : '/api/difficulty-levels';
-        const response = await fetch(url);
+        const response = await fetch('/api/difficulty-levels');
         if (!response.ok) {
           throw new Error('Failed to fetch difficulty levels');
         }
@@ -32,7 +29,7 @@ export const useDifficultyLevels = (language?: string): UseDifficultyLevelsResul
     };
 
     fetchLevels();
-  }, [language]);
+  }, []);
 
   return { levels, isLoading, error };
 };

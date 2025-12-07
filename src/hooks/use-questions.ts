@@ -2,17 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
-
-interface Question {
-  id: string;
-  question: string;
-  language: string;
-  difficulty?: string;
-  category?: string;
-}
+import type { PracticeQuestion } from '@/lib/types';
 
 interface UseQuestionsResult {
-  questions: Question[];
+  questions: PracticeQuestion[];
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
@@ -20,7 +13,7 @@ interface UseQuestionsResult {
 }
 
 export function useQuestions(): UseQuestionsResult {
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 

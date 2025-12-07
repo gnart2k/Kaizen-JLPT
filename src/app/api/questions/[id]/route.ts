@@ -3,18 +3,28 @@ import { questions, answers } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { questionSchema } from '@/validation-schema/question-schema';
 
 const questionUpdateSchema = z.object({
   question: z.string().min(1).optional(),
-  explanation: z.string().min(1).optional(),
-  language: z.string().min(1).optional(),
+  explanation: z.string().optional(),
+  languageId: z.string().uuid('Invalid language ID').optional(),
   difficultyLevelId: z.string().uuid('Invalid difficulty level ID').optional(),
-  category: z.string().optional(),
+  categoryId: z.string().uuid('Invalid category ID').optional(),
   answers: z.array(z.object({
     answerText: z.string().min(1),
     isCorrect: z.boolean(),
-  })).min(1).optional(),
-});
+  })).min(2, 'At least two answers are required').optional(),
+}).refine(
+  (data) => {
+    if (!data.answers) return true; // Skip validation if answers not provided
+    return data.answers.filter((a) => a.isCorrect).length === 1;
+  },
+  {
+    message: 'Exactly one answer must be marked as correct.',
+    path: ['answers'],
+  }
+);
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -23,6 +33,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       with: {
         answers: true,
         difficultyLevel: true,
+        language: true,
+        category: true,
       },
     });
 

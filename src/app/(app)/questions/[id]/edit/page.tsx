@@ -26,6 +26,9 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { questionSchema } from '@/validation-schema/question-schema';
+import { useDifficultyLevels } from '@/hooks/use-difficulty-levels';
+import { useLanguages } from '@/hooks/use-languages';
+import { useCategories } from '@/hooks/use-categories';
 
 const formSchema = questionSchema;
 
@@ -35,6 +38,10 @@ export default function EditQuestionPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+
+  const { levels, isLoading: levelsLoading, error: levelsError } = useDifficultyLevels();
+  const { languages, isLoading: languagesLoading, error: languagesError } = useLanguages();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -213,16 +220,18 @@ export default function EditQuestionPage() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Language</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={languagesLoading || !!languagesError}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a language" />
+                    <SelectValue placeholder={languagesLoading ? 'Loading languages...' : languagesError ? 'Error loading languages' : 'Select a language'} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {/* TODO: Fetch languages from API and map to SelectItem with ID as value */}
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="ja">Japanese</SelectItem>
+                  {languages.map((language) => (
+                    <SelectItem key={language.id} value={language.id}>
+                      {language.name} ({language.nativeName || language.code})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -236,17 +245,18 @@ export default function EditQuestionPage() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Difficulty</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={levelsLoading || !!levelsError}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a difficulty" />
+                    <SelectValue placeholder={levelsLoading ? 'Loading levels...' : levelsError ? 'Error loading levels' : 'Select a difficulty'} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {/* TODO: Fetch difficulty levels from API and map to SelectItem with ID as value */}
-                  <SelectItem value="easy">Easy</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="hard">Hard</SelectItem>
+                  {levels.map((level) => (
+                    <SelectItem key={level.id} value={level.id}>
+                      {level.levelName} ({level.language?.name || level.languageId})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -260,15 +270,19 @@ export default function EditQuestionPage() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={categoriesLoading || !!categoriesError}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={categoriesLoading ? 'Loading categories...' : categoriesError ? 'Error loading categories' : 'Select a category'} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {/* TODO: Fetch categories from API and map to SelectItem with ID as value */}
                   <SelectItem value="">No category</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
