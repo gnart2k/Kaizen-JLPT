@@ -5,15 +5,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const language = searchParams.get('language');
-
-    const difficultyLevelsQuery = db.query.difficultyLevels.findMany({
-      where: language ? eq(difficultyLevels.language, language) : undefined,
+    const difficultyLevels = await db.query.difficultyLevels.findMany({
+      with: {
+        language: true,
+      },
     });
-
-    const levels = await difficultyLevelsQuery;
-    return NextResponse.json(levels);
+    return NextResponse.json(difficultyLevels);
   } catch (error) {
     console.error('GET difficulty levels error:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });

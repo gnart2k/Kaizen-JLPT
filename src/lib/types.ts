@@ -26,19 +26,61 @@ export type LibraryItem = {
   status: 'New' | 'To Review' | 'Mastered';
 };
 
+export type Language = {
+    id: string;
+    code: string;
+    name: string;
+    nativeName?: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type Category = {
+    id: string;
+    languageId: string;
+    name: string;
+    description?: string;
+    sortOrder: number;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    language?: Language;
+};
+
+export type Label = {
+    id: string;
+    name: string;
+    color: string;
+    description?: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
 export type PracticeQuestion = {
     id: string;
     question: string;
-    options: string[];
-    correctAnswer: string;
     explanation?: string;
+    languageId: string;
+    categoryId?: string;
+    difficultyLevelId?: string;
+    answers: {
+        id: string;
+        answerText: string;
+        isCorrect: boolean;
+    }[];
+    language?: Language;
+    category?: Category;
+    difficultyLevel?: DifficultyLevel;
+    labels?: Label[];
 };
 
 export type DifficultyLevel = {
   id: string;
-  language: string;
+  languageId: string;
   levelName: string;
-  description: string | null;
+  description?: string;
   createdAt: string;
   updatedAt: string;
+  language?: Language;
 };

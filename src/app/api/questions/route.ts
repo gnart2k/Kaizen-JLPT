@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { questions, answers } from '@/lib/db/schema';
+import { questions, answers, languages, categories } from '@/lib/db/schema';
 import { questionSchema } from '@/validation-schema/question-schema';
 import { eq, inArray } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
@@ -12,6 +12,8 @@ export async function GET(req: Request) {
       with: {
         answers: true,
         difficultyLevel: true,
+        language: true,
+        category: true,
       },
     });
     return NextResponse.json(allQuestions);
@@ -25,14 +27,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // Assuming the client sends the data in the new structured format
     const validatedData = questionSchema.parse(body);
-    const { answers: answerData, explanation, ...restQuestionData } = validatedData;
-
-    const questionDataForDb = {
-      ...restQuestionData,
-      explanation: explanation || '', // Ensure explanation is a string for Drizzle schema
-    };
+    const { answers: answerData, ...questionDataForDb } = validatedData;
 
     const newQuestion = await db.transaction(async (tx) => {
       // 1. Insert into questions table

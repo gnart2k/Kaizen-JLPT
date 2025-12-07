@@ -38,16 +38,28 @@ export const practiceQuestions: PracticeQuestion[] = [
     {
         id: 'q1',
         question: '公園（　）散歩します。',
-        options: ['を', 'に', 'で', 'へ'],
-        correctAnswer: 'を',
         explanation: 'The particle「を」is used here to indicate the place through which movement occurs. While「で」can indicate a location of an action,「を」is more natural for actions like walking through a park (散歩する).',
+        languageId: 'ja-lang-id',
+        categoryId: 'grammar-cat-id',
+        answers: [
+            { id: 'a1', answerText: 'を', isCorrect: true },
+            { id: 'a2', answerText: 'に', isCorrect: false },
+            { id: 'a3', answerText: 'で', isCorrect: false },
+            { id: 'a4', answerText: 'へ', isCorrect: false },
+        ],
     },
     {
         id: 'q2',
         question: 'これは（　）の辞書ですか。',
-        options: ['だれ', 'どこ', 'なん', 'どれ'],
-        correctAnswer: 'だれ',
         explanation: 'The question is asking "Whose dictionary is this?". 「だれ」means "who". When combined with the possessive particle「の」, it becomes「だれの」, meaning "whose".',
+        languageId: 'ja-lang-id',
+        categoryId: 'grammar-cat-id',
+        answers: [
+            { id: 'a5', answerText: 'だれ', isCorrect: true },
+            { id: 'a6', answerText: 'どこ', isCorrect: false },
+            { id: 'a7', answerText: 'なん', isCorrect: false },
+            { id: 'a8', answerText: 'どれ', isCorrect: false },
+        ],
     },
 ];
 

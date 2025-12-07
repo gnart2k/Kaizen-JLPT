@@ -29,7 +29,8 @@ export function PracticeSession({ questions }: PracticeSessionProps) {
     const handleSubmit = async () => {
         if (!selectedAnswer) return;
 
-        const isCorrect = selectedAnswer === question.correctAnswer;
+        const correctAnswer = question.answers.find(answer => answer.isCorrect)?.answerText || '';
+        const isCorrect = selectedAnswer === correctAnswer;
         setFeedback(isCorrect ? 'correct' : 'incorrect');
 
         setIsLoading(true);
@@ -37,9 +38,9 @@ export function PracticeSession({ questions }: PracticeSessionProps) {
 
         let query = '';
         if (isCorrect) {
-            query = question.explanation || `The answer for "${question.question}" is "${question.correctAnswer}". Explain why this is correct.`
+            query = question.explanation || `The answer for "${question.question}" is "${correctAnswer}". Explain why this is correct.`
         } else {
-            query = `In the sentence "${question.question}", why is the answer "${selectedAnswer}" incorrect and "${question.correctAnswer}" correct?`;
+            query = `In the sentence "${question.question}", why is the answer "${selectedAnswer}" incorrect and "${correctAnswer}" correct?`;
         }
         
         const result = await getExplanation({ query });
@@ -63,10 +64,10 @@ export function PracticeSession({ questions }: PracticeSessionProps) {
         <div>
             <h3 className="text-xl font-semibold mb-4 font-headline">{question.question}</h3>
             <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer || ''} disabled={!!feedback} className="gap-3">
-                {question.options.map(option => (
-                    <Label key={option} htmlFor={option} className={`flex items-center space-x-3 p-4 border rounded-lg transition-colors cursor-pointer ${selectedAnswer === option ? 'border-primary bg-primary/5' : 'hover:bg-accent/50'}`}>
-                        <RadioGroupItem value={option} id={option} />
-                        <span className="text-base">{option}</span>
+                {question.answers.map(answer => (
+                    <Label key={answer.id} htmlFor={answer.id} className={`flex items-center space-x-3 p-4 border rounded-lg transition-colors cursor-pointer ${selectedAnswer === answer.answerText ? 'border-primary bg-primary/5' : 'hover:bg-accent/50'}`}>
+                        <RadioGroupItem value={answer.answerText} id={answer.id} />
+                        <span className="text-base">{answer.answerText}</span>
                     </Label>
                 ))}
             </RadioGroup>
@@ -90,7 +91,7 @@ export function PracticeSession({ questions }: PracticeSessionProps) {
                                     {feedback === 'correct' ? <CheckCircle /> : <XCircle />}
                                     {feedback === 'correct' ? 'Correct!' : 'Incorrect'}
                                 </CardTitle>
-                                {feedback === 'incorrect' && <CardDescription>Correct answer: {question.correctAnswer}</CardDescription>}
+                                {feedback === 'incorrect' && <CardDescription>Correct answer: {question.answers.find(answer => answer.isCorrect)?.answerText}</CardDescription>}
                             </>
                         )}
                     </CardHeader>
