@@ -41,3 +41,10 @@ The plan document must include:
 *   **File Location:** The absolute or relative path where each new file will be located.
 *   **Description:** A detailed explanation of the feature and its motivation.
 *   **File Structure:** A high-level outline or pseudo-code for the structure of the main files.
+
+## 4. Commit and Push Policy
+
+*   **Commit Requirement:** Agents MUST NOT commit or push code to the remote repository unless explicitly requested by the user.
+*   **Verification:** After completing a task, agents should ensure all changes are staged and verified (lint/typecheck/build) but stop short of committing or pushing.
+*   **Commit Message:** When requested to commit, the agent must follow the standard commit message guidelines (type: description).
+
