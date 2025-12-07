@@ -46,9 +46,9 @@ export default function CreateQuestionPage() {
         { answerText: '', isCorrect: true },
         { answerText: '', isCorrect: false },
       ],
-      language: 'jp',
+      languageId: '',
       difficultyLevelId: '',
-      category: '',
+      categoryId: '',
     });
   }, [form]);
 
@@ -188,7 +188,7 @@ export default function CreateQuestionPage() {
 
         <FormField
           control={form.control}
-          name="language"
+          name="languageId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Language</FormLabel>
@@ -199,6 +199,7 @@ export default function CreateQuestionPage() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
+                  {/* TODO: Fetch languages from API and map to SelectItem with ID as value */}
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="ja">Japanese</SelectItem>
                 </SelectContent>
@@ -223,7 +224,7 @@ export default function CreateQuestionPage() {
                 <SelectContent>
                   {levels.map((level) => (
                     <SelectItem key={level.id} value={level.id}>
-                      {level.levelName} ({level.language})
+                      {level.levelName} ({level.language?.name || level.languageId})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -235,13 +236,21 @@ export default function CreateQuestionPage() {
 
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Grammar, Vocabulary, N5" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {/* TODO: Fetch categories from API and map to SelectItem with ID as value */}
+                  <SelectItem value="">No category</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

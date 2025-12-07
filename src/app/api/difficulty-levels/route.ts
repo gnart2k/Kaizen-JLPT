@@ -3,8 +3,11 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const difficultyLevels = await db.query.difficultyLevels.findMany();
-    console.log(difficultyLevels)
+    const difficultyLevels = await db.query.difficultyLevels.findMany({
+      with: {
+        language: true,
+      },
+    });
     return NextResponse.json(difficultyLevels);
   } catch (error) {
     console.error('GET difficulty levels error:', error);
