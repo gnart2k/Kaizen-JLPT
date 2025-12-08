@@ -11,6 +11,7 @@ export function useAuth() {
   const router = useRouter();
   const { toast } = useToast();
   const { fetchUser, setUser } = useUserStore();
+  const user = useUserStore((state) => state.user);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -103,6 +104,7 @@ export function useAuth() {
   };
 
   return {
+    user,
     isLoading,
     login,
     register,

@@ -166,7 +166,7 @@ export default function BulkUploadPage() {
               <CheckCircle className="h-4 w-4" />
               <AlertTitle>Valid Questions ({totalValid})</AlertTitle>
               <AlertDescription>
-                {totalValid} questions are ready for upload. Review the preview below and click "Confirm Upload" to save them to the database.
+                {totalValid} questions are ready for upload. Review the preview below and click &quot;Confirm Upload&quot; to save them to the database.
               </AlertDescription>
             </Alert>
           )}

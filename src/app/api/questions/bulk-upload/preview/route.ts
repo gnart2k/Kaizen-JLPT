@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseQuestionsFromFile } from '@/lib/question-parser';
+// import { parseQuestionsFromFile } from '@/lib/question-parser';
 
 // Set config for Next.js to handle file uploads
 export const config = {
@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
     const fileBuffer = await file.arrayBuffer();
     const fileData = Buffer.from(fileBuffer);
 
-    const { questions, errors } = parseQuestionsFromFile(fileData, file.type);
+    // TODO: Implement question parser
+    const questions: any[] = [];
+    const errors: string[] = ['Question parser not implemented yet'];
 
     return NextResponse.json({ questions, errors });
   } catch (error) {

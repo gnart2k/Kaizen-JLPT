@@ -8,6 +8,7 @@ export interface AuthTokenPayload {
   email: string;
   role: typeof userRoleEnum.enumValues[number];
   plan: typeof userPlanEnum.enumValues[number];
+  targetLevelId?: string;
 }
 
 // Ensure JWT_SECRET is set
@@ -39,6 +40,7 @@ export function verifyAuthToken(token: string): AuthTokenPayload | null {
       email: payload.email,
       role: payload.role,
       plan: payload.plan,
+      targetLevelId: payload.targetLevelId
     };
   } catch (error) {
     return null;

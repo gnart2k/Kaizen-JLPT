@@ -37,18 +37,20 @@ export async function POST(request: Request) {
       email: user.email,
       role: user.role,
       plan: user.plan,
+      targetLevelId: user.targetLevelId ?? ""
     });
     const cookie = serializeAuthCookie(token);
-    
-    return NextResponse.json({ 
-      message: 'Login successful', 
-      user: { 
-        id: user.id, 
-        email: user.email, 
-        role: user.role, 
-        plan: user.plan 
-      } 
-    }, { 
+
+    return NextResponse.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        plan: user.plan,
+        targetLevelId: user.targetLevelId
+      }
+    }, {
       status: 200,
       headers: { 'Set-Cookie': cookie },
     });

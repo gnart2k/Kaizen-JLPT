@@ -1,9 +1,10 @@
 import { db } from '@/lib/db';
-import { difficultyLevels, languages } from '@/lib/db/schema';
+import { difficultyLevels, languages, categories } from '@/lib/db/schema';
 import { InferInsertModel } from 'drizzle-orm';
 
 type NewDifficultyLevel = InferInsertModel<typeof difficultyLevels>;
 type NewLanguage = InferInsertModel<typeof languages>;
+type NewCategory = InferInsertModel<typeof categories>;
 
 const languageSeedData: NewLanguage[] = [
   { code: 'ja', name: 'Japanese', nativeName: '日本語', isActive: true },
@@ -13,41 +14,10 @@ const languageSeedData: NewLanguage[] = [
 ];
 
 // This will be populated after languages are created
-const difficultyLevelSeedData: Omit<NewDifficultyLevel, 'languageId'>[] = [
-  // Japanese (JLPT)
-  { levelName: 'N5', description: 'Beginner level Japanese (JLPT N5).' },
-  { levelName: 'N4', description: 'Lower intermediate level Japanese (JLPT N4).' },
-  { levelName: 'N3', description: 'Intermediate level Japanese (JLPT N3).' },
-  { levelName: 'N2', description: 'Upper intermediate level Japanese (JLPT N2).' },
-  { levelName: 'N1', description: 'Advanced level Japanese (JLPT N1).' },
-
-  // Korean (TOPIK)
-  { levelName: 'TOPIK 1', description: 'Beginner level Korean (TOPIK 1).' },
-  { levelName: 'TOPIK 2', description: 'Lower intermediate level Korean (TOPIK 2).' },
-  { levelName: 'TOPIK 3', description: 'Intermediate level Korean (TOPIK 3).' },
-  { levelName: 'TOPIK 4', description: 'Upper intermediate level Korean (TOPIK 4).' },
-  { levelName: 'TOPIK 5', description: 'Advanced level Korean (TOPIK 5).' },
-  { levelName: 'TOPIK 6', description: 'Highest level Korean (TOPIK 6).' },
-
-  // Chinese (HSK)
-  { levelName: 'HSK 1', description: 'Beginner level Chinese (HSK 1).' },
-  { levelName: 'HSK 2', description: 'Lower intermediate level Chinese (HSK 2).' },
-  { levelName: 'HSK 3', description: 'Intermediate level Chinese (HSK 3).' },
-  { levelName: 'HSK 4', description: 'Upper intermediate level Chinese (HSK 4).' },
-  { levelName: 'HSK 5', description: 'Advanced level Chinese (HSK 5).' },
-  { levelName: 'HSK 6', description: 'Highest level Chinese (HSK 6).' },
-
-  // English (CEFR)
-  { levelName: 'A1', description: 'CEFR A1 (Beginner) level English.' },
-  { levelName: 'A2', description: 'CEFR A2 (Elementary) level English.' },
-  { levelName: 'B1', description: 'CEFR B1 (Intermediate) level English.' },
-  { levelName: 'B2', description: 'CEFR B2 (Upper Intermediate) level English.' },
-  { levelName: 'C1', description: 'CEFR C1 (Advanced) level English.' },
-];
-
 async function seedLanguages() {
   console.log('Seeding languages...');
   try {
+    const language = await db.query.languages.findMany({});
     const result = await db
       .insert(languages)
       .values(languageSeedData)
@@ -67,60 +37,132 @@ async function seedLanguages() {
 async function seedDifficultyLevels() {
   console.log('Seeding difficulty levels...');
   try {
-    // First get the languages
+    // Load languages
     const languageMap = await db.query.languages.findMany({
       columns: { id: true, code: true }
-    }).then(languages => 
+    }).then(languages =>
       languages.reduce((acc, lang) => {
         acc[lang.code] = lang.id;
         return acc;
       }, {} as Record<string, string>)
     );
 
-    // Map the difficulty levels with proper languageId
+    // Prepare seed data
     const seedData: NewDifficultyLevel[] = [
-      // Japanese (JLPT)
       { languageId: languageMap['ja'], levelName: 'N5', description: 'Beginner level Japanese (JLPT N5).' },
       { languageId: languageMap['ja'], levelName: 'N4', description: 'Lower intermediate level Japanese (JLPT N4).' },
       { languageId: languageMap['ja'], levelName: 'N3', description: 'Intermediate level Japanese (JLPT N3).' },
       { languageId: languageMap['ja'], levelName: 'N2', description: 'Upper intermediate level Japanese (JLPT N2).' },
       { languageId: languageMap['ja'], levelName: 'N1', description: 'Advanced level Japanese (JLPT N1).' },
-
-      // Korean (TOPIK)
-      { languageId: languageMap['ko'], levelName: 'TOPIK 1', description: 'Beginner level Korean (TOPIK 1).' },
-      { languageId: languageMap['ko'], levelName: 'TOPIK 2', description: 'Lower intermediate level Korean (TOPIK 2).' },
-      { languageId: languageMap['ko'], levelName: 'TOPIK 3', description: 'Intermediate level Korean (TOPIK 3).' },
-      { languageId: languageMap['ko'], levelName: 'TOPIK 4', description: 'Upper intermediate level Korean (TOPIK 4).' },
-      { languageId: languageMap['ko'], levelName: 'TOPIK 5', description: 'Advanced level Korean (TOPIK 5).' },
-      { languageId: languageMap['ko'], levelName: 'TOPIK 6', description: 'Highest level Korean (TOPIK 6).' },
-
-      // Chinese (HSK)
-      { languageId: languageMap['zh'], levelName: 'HSK 1', description: 'Beginner level Chinese (HSK 1).' },
-      { languageId: languageMap['zh'], levelName: 'HSK 2', description: 'Lower intermediate level Chinese (HSK 2).' },
-      { languageId: languageMap['zh'], levelName: 'HSK 3', description: 'Intermediate level Chinese (HSK 3).' },
-      { languageId: languageMap['zh'], levelName: 'HSK 4', description: 'Upper intermediate level Chinese (HSK 4).' },
-      { languageId: languageMap['zh'], levelName: 'HSK 5', description: 'Advanced level Chinese (HSK 5).' },
-      { languageId: languageMap['zh'], levelName: 'HSK 6', description: 'Highest level Chinese (HSK 6).' },
-
-      // English (CEFR)
-      { languageId: languageMap['en'], levelName: 'A1', description: 'CEFR A1 (Beginner) level English.' },
-      { languageId: languageMap['en'], levelName: 'A2', description: 'CEFR A2 (Elementary) level English.' },
-      { languageId: languageMap['en'], levelName: 'B1', description: 'CEFR B1 (Intermediate) level English.' },
-      { languageId: languageMap['en'], levelName: 'B2', description: 'CEFR B2 (Upper Intermediate) level English.' },
+      // ...
       { languageId: languageMap['en'], levelName: 'C1', description: 'CEFR C1 (Advanced) level English.' },
     ];
 
-    const result = await db
-      .insert(difficultyLevels)
-      .values(seedData)
-      .onConflictDoNothing({
-        target: [difficultyLevels.languageId, difficultyLevels.levelName],
-      })
-      .returning({ id: difficultyLevels.id });
+    // Load current DB rows
+    const existing = await db.query.difficultyLevels.findMany({
+      columns: { languageId: true, levelName: true }
+    });
 
-    console.log(`Successfully seeded ${result.length} new difficulty levels.`);
+    // Convert to a Set for fast lookup
+    const existsSet = new Set(
+      existing.map(d => `${d.languageId}:${d.levelName}`)
+    );
+
+    // Filter out duplicates
+    const newRows = seedData.filter(
+      d => !existsSet.has(`${d.languageId}:${d.levelName}`)
+    );
+
+    console.log("Rows to insert:", newRows.length);
+
+    if (newRows.length > 0) {
+      const result = await db
+        .insert(difficultyLevels)
+        .values(newRows)
+        .returning({ id: difficultyLevels.id });
+
+      console.log(`Inserted ${result.length} new difficulty levels.`);
+    } else {
+      console.log("No new difficulty levels to insert.");
+    }
+
   } catch (error) {
     console.error('Error seeding difficulty levels:', error);
+    process.exit(1);
+  }
+}
+
+async function seedCategories() {
+  console.log('Seeding categories...');
+  try {
+    // Load languages
+    const languageMap = await db.query.languages.findMany({
+      columns: { id: true, code: true }
+    }).then(languages =>
+      languages.reduce((acc, lang) => {
+        acc[lang.code] = lang.id;
+        return acc;
+      }, {} as Record<string, string>)
+    );
+
+    // Prepare seed data
+    const seedData: NewCategory[] = [
+      // Japanese categories
+      { languageId: languageMap['ja'], name: 'Vocabulary', description: 'Japanese vocabulary questions', sortOrder: 1, isActive: true },
+      { languageId: languageMap['ja'], name: 'Grammar', description: 'Japanese grammar questions', sortOrder: 2, isActive: true },
+      { languageId: languageMap['ja'], name: 'Reading', description: 'Japanese reading comprehension questions', sortOrder: 3, isActive: true },
+      { languageId: languageMap['ja'], name: 'Listening', description: 'Japanese listening comprehension questions', sortOrder: 4, isActive: true },
+      { languageId: languageMap['ja'], name: 'Kanji', description: 'Japanese kanji questions', sortOrder: 5, isActive: true },
+      
+      // Korean categories
+      { languageId: languageMap['ko'], name: 'Vocabulary', description: 'Korean vocabulary questions', sortOrder: 1, isActive: true },
+      { languageId: languageMap['ko'], name: 'Grammar', description: 'Korean grammar questions', sortOrder: 2, isActive: true },
+      { languageId: languageMap['ko'], name: 'Reading', description: 'Korean reading comprehension questions', sortOrder: 3, isActive: true },
+      { languageId: languageMap['ko'], name: 'Listening', description: 'Korean listening comprehension questions', sortOrder: 4, isActive: true },
+      
+      // Chinese categories
+      { languageId: languageMap['zh'], name: 'Vocabulary', description: 'Chinese vocabulary questions', sortOrder: 1, isActive: true },
+      { languageId: languageMap['zh'], name: 'Grammar', description: 'Chinese grammar questions', sortOrder: 2, isActive: true },
+      { languageId: languageMap['zh'], name: 'Reading', description: 'Chinese reading comprehension questions', sortOrder: 3, isActive: true },
+      { languageId: languageMap['zh'], name: 'Characters', description: 'Chinese character questions', sortOrder: 4, isActive: true },
+      
+      // English categories
+      { languageId: languageMap['en'], name: 'Vocabulary', description: 'English vocabulary questions', sortOrder: 1, isActive: true },
+      { languageId: languageMap['en'], name: 'Grammar', description: 'English grammar questions', sortOrder: 2, isActive: true },
+      { languageId: languageMap['en'], name: 'Reading', description: 'English reading comprehension questions', sortOrder: 3, isActive: true },
+      { languageId: languageMap['en'], name: 'Listening', description: 'English listening comprehension questions', sortOrder: 4, isActive: true },
+    ];
+
+    // Load current DB rows
+    const existing = await db.query.categories.findMany({
+      columns: { languageId: true, name: true }
+    });
+
+    // Convert to a Set for fast lookup
+    const existsSet = new Set(
+      existing.map(c => `${c.languageId}:${c.name}`)
+    );
+
+    // Filter out duplicates
+    const newRows = seedData.filter(
+      c => !existsSet.has(`${c.languageId}:${c.name}`)
+    );
+
+    console.log("Categories to insert:", newRows.length);
+
+    if (newRows.length > 0) {
+      const result = await db
+        .insert(categories)
+        .values(newRows)
+        .returning({ id: categories.id });
+
+      console.log(`Inserted ${result.length} new categories.`);
+    } else {
+      console.log("No new categories to insert.");
+    }
+
+  } catch (error) {
+    console.error('Error seeding categories:', error);
     process.exit(1);
   }
 }
@@ -128,6 +170,7 @@ async function seedDifficultyLevels() {
 async function main() {
   await seedLanguages();
   await seedDifficultyLevels();
+  await seedCategories();
   // Exit the process gracefully after seeding
   process.exit(0);
 }

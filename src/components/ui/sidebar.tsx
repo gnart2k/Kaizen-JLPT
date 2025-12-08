@@ -652,8 +652,12 @@ const SidebarMenuSkeleton = React.forwardRef<
 >(({ className, showIcon = false, ...props }, ref) => {
   // Random width between 50 to 90%.
   const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
+    // Use a hash of props to generate consistent random width
+    const hash = JSON.stringify(props).split('').reduce((acc, char) => {
+      return char.charCodeAt(0) + ((acc << 5) - acc);
+    }, 0);
+    return `${Math.abs(hash % 40) + 50}%`;
+  }, [props])
 
   return (
     <div

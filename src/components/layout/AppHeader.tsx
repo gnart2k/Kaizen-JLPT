@@ -4,9 +4,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { TargetLevelSelector } from './TargetLevelSelector';
+import { useTargetLevel } from '@/hooks/use-target-level';
+import { useDifficultyLevels } from '@/hooks/use-difficulty-levels';
 
 export function AppHeader() {
   const { theme, setTheme } = useTheme();
+  const { targetLevelId, updateTargetLevel, isLoading: targetLevelLoading } = useTargetLevel();
+  const { levels, isLoading: levelsLoading } = useDifficultyLevels();
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -29,6 +34,12 @@ export function AppHeader() {
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>
+        <TargetLevelSelector
+          currentLevel={targetLevelId}
+          onLevelChange={updateTargetLevel}
+          levels={levels}
+          isLoading={targetLevelLoading || levelsLoading}
+        />
       </div>
     </div>
   );

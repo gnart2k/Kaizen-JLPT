@@ -15,6 +15,7 @@ export const useDifficultyLevels = (): UseDifficultyLevelsResult => {
   useEffect(() => {
     const fetchLevels = async () => {
       try {
+        const currentLanguage = process.env.NEXT_PUBLIC_LANGUAGE
         const response = await fetch('/api/difficulty-levels');
         if (!response.ok) {
           throw new Error('Failed to fetch difficulty levels');

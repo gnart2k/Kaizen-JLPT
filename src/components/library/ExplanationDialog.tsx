@@ -22,19 +22,27 @@ export function ExplanationDialog({ item, open, onOpenChange }: ExplanationDialo
 
     useEffect(() => {
         if (open && item) {
-            setIsLoading(true);
-            setError('');
-            setExplanation('');
+            let isMounted = true;
             const fetchExplanation = async () => {
-                const result = await getExplanation({ query: item.item });
-                if (result.success) {
-                    setExplanation(result.explanation || '');
-                } else {
-                    setError(result.error || 'An unknown error occurred.');
+                if (isMounted) {
+                    setIsLoading(true);
+                    setError('');
+                    setExplanation('');
                 }
-                setIsLoading(false);
+                const result = await getExplanation({ query: item.item });
+                if (isMounted) {
+                    if (result.success) {
+                        setExplanation(result.explanation || '');
+                    } else {
+                        setError(result.error || 'An unknown error occurred.');
+                    }
+                    setIsLoading(false);
+                }
             };
             fetchExplanation();
+            return () => {
+                isMounted = false;
+            };
         }
     }, [open, item]);
 
