@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { questions, answers, languages, categories } from '@/lib/db/schema';
+import { questions, answers, languages, categories, questionLabels } from '@/lib/db/schema';
 import { questionSchema } from '@/validation-schema/question-schema';
 import { eq, inArray } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const validatedData = questionSchema.parse(body);
-    const { answers: answerData, ...questionDataForDb } = validatedData;
+    const { answers: answerData, labelIds, ...questionDataForDb } = validatedData;
 
     const newQuestion = await db.transaction(async (tx) => {
       // 1. Insert into questions table
@@ -46,6 +46,15 @@ export async function POST(req: Request) {
       }));
 
       const newAnswers = await tx.insert(answers).values(answersToInsert).returning();
+
+      // 3. Insert question-labels relationships if labelIds are provided
+      if (labelIds && labelIds.length > 0) {
+        const questionLabelsToInsert = labelIds.map(labelId => ({
+          questionId: question.id,
+          labelId: labelId,
+        }));
+        await tx.insert(questionLabels).values(questionLabelsToInsert);
+      }
 
       return {
         ...questionDataForDb,

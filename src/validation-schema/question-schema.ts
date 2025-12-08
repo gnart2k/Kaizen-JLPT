@@ -7,6 +7,7 @@ export const questionSchema = z
     languageId: z.string().uuid('Invalid language ID'),
     difficultyLevelId: z.string().uuid('Invalid difficulty level ID').optional(),
     categoryId: z.string().uuid('Invalid category ID').optional(),
+    labelIds: z.array(z.string().uuid('Invalid label ID')).optional(),
     answers: z.array(
       z.object({
         answerText: z.string().min(1, 'Answer text is required'),

@@ -26,35 +26,41 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { questionSchema } from '@/validation-schema/question-schema';
 import { useDifficultyLevels } from '@/hooks/use-difficulty-levels';
-import { useLanguages } from '@/hooks/use-languages';
 import { useCategories } from '@/hooks/use-categories';
+import { useLabels } from '@/hooks/use-labels';
+import { useLanguage } from '@/hooks/use-language';
 
-const formSchema = questionSchema
+const formSchema = questionSchema;
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreateQuestionPage() {
   const router = useRouter();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onSubmit',
   });
 
   const { levels, isLoading: levelsLoading, error: levelsError } = useDifficultyLevels();
-  const { languages, isLoading: languagesLoading, error: languagesError } = useLanguages();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
+  const { labels } = useLabels();
+  const { currentLanguageId, isLoading: languageLoading, error: languageError } = useLanguage();
 
   useEffect(() => {
-    form.reset({
-      question: '',
-      explanation: '',
-      answers: [
-        { answerText: '', isCorrect: true },
-        { answerText: '', isCorrect: false },
-      ],
-      languageId: '',
-      difficultyLevelId: '',
-      categoryId: '',
-    });
-  }, [form]);
+    if (currentLanguageId) {
+      form.reset({
+        question: '',
+        explanation: '',
+        answers: [
+          { answerText: '', isCorrect: true },
+          { answerText: '', isCorrect: false },
+        ],
+        languageId: currentLanguageId,
+        difficultyLevelId: '',
+        categoryId: '',
+        labelIds: [],
+      });
+    }
+  }, [currentLanguageId, form]);
 
   const {
     fields: answersFields,
@@ -66,13 +72,33 @@ export default function CreateQuestionPage() {
   });
 
   async function onSubmit(values: FormValues) {
+    console.log('=== FORM SUBMIT TRIGGERED ===');
+    console.log('Form submitted with values:', values);
+    console.log('Form errors:', form.formState.errors);
+    console.log('Current language ID from context:', currentLanguageId);
+    
+    if (!currentLanguageId) {
+      toast({
+        title: 'Configuration Error',
+        description: 'Language not loaded',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const submissionData = {
+      ...values,
+      languageId: currentLanguageId,
+    };
+    console.log('Submission data:', submissionData);
+
     try {
       const response = await fetch('/api/questions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(submissionData),
       });
 
       if (!response.ok) {
@@ -84,6 +110,7 @@ export default function CreateQuestionPage() {
       });
       router.push('/questions');
     } catch (error) {
+      console.error('Submit error:', error);
       toast({
         title: 'Error creating question',
         description: (error as Error).message,
@@ -92,9 +119,18 @@ export default function CreateQuestionPage() {
     }
   }
 
+  if (languageLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading language configuration...</div>;
+  }
+
+  if (languageError) {
+    return <div className="flex items-center justify-center h-screen text-red-500">Error: {languageError}</div>;
+  }
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <div className="max-h-screen overflow-y-auto">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-6 pb-20" noValidate>
         <FormField
           control={form.control}
           name="question"
@@ -192,30 +228,7 @@ export default function CreateQuestionPage() {
 
 
 
-        <FormField
-          control={form.control}
-          name="languageId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Language</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value} disabled={languagesLoading || !!languagesError}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={languagesLoading ? 'Loading languages...' : languagesError ? 'Error loading languages' : 'Select a language'} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {languages.map((language) => (
-                    <SelectItem key={language.id} value={language.id}>
-                      {language.name} ({language.nativeName || language.code})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
 
         <FormField
           control={form.control}
@@ -255,7 +268,6 @@ export default function CreateQuestionPage() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">No category</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -268,9 +280,48 @@ export default function CreateQuestionPage() {
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="labelIds"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Labels</FormLabel>
+              <div className="space-y-2">
+                {labels.map((label) => (
+                  <div key={label.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={label.id}
+                      checked={field.value?.includes(label.id) || false}
+                      onChange={(e) => {
+                        const currentValues = field.value || [];
+                        if (e.target.checked) {
+                          field.onChange([...currentValues, label.id]);
+                        } else {
+                          field.onChange(currentValues.filter((id: string) => id !== label.id));
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <label htmlFor={label.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center space-x-2">
+                      <span>{label.name}</span>
+                      <span 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: label.color }}
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit">Create Question</Button>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }
 
